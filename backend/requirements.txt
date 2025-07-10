@@ -23,7 +23,6 @@ Flask==3.1.0
 Flask-Cors==5.0.0
 Flask-SQLAlchemy==3.1.1
 frozenlist==1.6.0
-future @ file:///AppleInternal/Library/BuildRoots/39d9dc1a-2111-11f0-be06-226177e5bb69/Library/Caches/com.apple.xbs/Sources/python3/future-0.18.2-py3-none-any.whl
 gotrue==2.12.0
 greenlet==3.1.1
 h11==0.14.0
@@ -70,7 +69,6 @@ pytz==2025.2
 realtime==2.4.2
 requests==2.32.4
 selenium==4.33.0
-six @ file:///AppleInternal/Library/BuildRoots/39d9dc1a-2111-11f0-be06-226177e5bb69/Library/Caches/com.apple.xbs/Sources/python3/six-1.15.0-py2.py3-none-any.whl
 sniffio==1.3.1
 sortedcontainers==2.4.0
 soupsieve==2.7
@@ -95,3 +93,5 @@ wsproto==1.2.0
 xlsxwriter==3.2.5
 yarl==1.20.0
 zipp==3.21.0
+future==0.18.2
+six==1.15.0
