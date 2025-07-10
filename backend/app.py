@@ -7,7 +7,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-import chromedriver_autoinstaller
 import os
 import io
 import xlsxwriter
@@ -47,13 +46,14 @@ init_db()
 
 # === Scraping Logic ===
 def extract_visible_specs(url):
-    chromedriver_autoinstaller.install()
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    service = Service()
+    options.add_argument("--window-size=1920x1080")
+    options.binary_location = "/usr/bin/google-chrome"
+    service = Service(executable_path="/usr/local/bin/chromedriver")
     driver = webdriver.Chrome(service=service, options=options)
 
     try:
