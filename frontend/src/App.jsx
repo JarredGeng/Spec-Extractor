@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const BACKEND_URL = "https://spec-extractor.onrender.com";
+
 function App() {
   const [url, setUrl] = useState('');
   const [output, setOutput] = useState([]);
@@ -13,7 +15,7 @@ function App() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:5001/api/specs', {
+      const res = await fetch(`${BACKEND_URL}/api/specs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
@@ -27,18 +29,18 @@ function App() {
   };
 
   const fetchDatabase = async () => {
-    const res = await fetch('http://127.0.0.1:5001/api/database');
+    const res = await fetch(`${BACKEND_URL}/api/database`);
     const data = await res.json();
     setDbData(data);
   };
 
   const deleteModel = async (model) => {
-    await fetch(`http://127.0.0.1:5001/api/delete/${model}`, { method: 'DELETE' });
+    await fetch(`${BACKEND_URL}/api/delete/${model}`, { method: 'DELETE' });
     fetchDatabase();
   };
 
   const downloadAll = () => {
-    window.open('http://127.0.0.1:5001/api/download-all', '_blank');
+    window.open(`${BACKEND_URL}/api/download-all`, '_blank');
   };
 
   useEffect(() => {
@@ -120,7 +122,7 @@ function App() {
                   <td>{item.Model}</td>
                   <td>{item['Date Scraped'] || '-'}</td>
                   <td>
-                    <a href={`http://127.0.0.1:5001/api/download/${item.Model}`} target="_blank" rel="noopener noreferrer">📄 Download XLSX</a>
+                    <a href={`${BACKEND_URL}/api/download/${item.Model}`} target="_blank" rel="noopener noreferrer">📄 Download XLSX</a>
                     <button onClick={() => deleteModel(item.Model)} style={{ marginLeft: 10, color: 'red' }}>
                       ❌ Delete
                     </button>
