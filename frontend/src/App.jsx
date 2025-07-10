@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 
-const BACKEND_URL = "https://spec-extractor.onrender.com";
-
 function App() {
   const [url, setUrl] = useState('');
   const [output, setOutput] = useState([]);
@@ -10,12 +8,14 @@ function App() {
   const [dbData, setDbData] = useState([]);
   const [search, setSearch] = useState('');
 
+  const API_BASE = 'https://spec-extractor.onrender.com/api';
+
   const getSpecs = async () => {
     if (!url.trim()) return;
 
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/specs`, {
+      const res = await fetch(`${API_BASE}/specs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
@@ -29,18 +29,18 @@ function App() {
   };
 
   const fetchDatabase = async () => {
-    const res = await fetch(`${BACKEND_URL}/api/database`);
+    const res = await fetch(`${API_BASE}/database`);
     const data = await res.json();
     setDbData(data);
   };
 
   const deleteModel = async (model) => {
-    await fetch(`${BACKEND_URL}/api/delete/${model}`, { method: 'DELETE' });
+    await fetch(`${API_BASE}/delete/${model}`, { method: 'DELETE' });
     fetchDatabase();
   };
 
   const downloadAll = () => {
-    window.open(`${BACKEND_URL}/api/download-all`, '_blank');
+    window.open(`${API_BASE}/download-all`, '_blank');
   };
 
   useEffect(() => {
@@ -122,7 +122,7 @@ function App() {
                   <td>{item.Model}</td>
                   <td>{item['Date Scraped'] || '-'}</td>
                   <td>
-                    <a href={`${BACKEND_URL}/api/download/${item.Model}`} target="_blank" rel="noopener noreferrer">📄 Download XLSX</a>
+                    <a href={`${API_BASE}/download/${item.Model}`} target="_blank" rel="noopener noreferrer">📄 Download XLSX</a>
                     <button onClick={() => deleteModel(item.Model)} style={{ marginLeft: 10, color: 'red' }}>
                       ❌ Delete
                     </button>
