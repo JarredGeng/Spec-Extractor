@@ -4,9 +4,10 @@ import re
 import sqlite3
 from datetime import datetime
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+import chromedriver_autoinstaller
 import os
 import io
 import xlsxwriter
@@ -16,7 +17,6 @@ app = Flask(__name__)
 CORS(app)
 
 DB_FILE = "specs.db"
-GECKODRIVER_PATH = "/usr/local/bin/geckodriver"
 
 # === DB Init ===
 def init_db():
@@ -47,13 +47,14 @@ init_db()
 
 # === Scraping Logic ===
 def extract_visible_specs(url):
+    chromedriver_autoinstaller.install()
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1920x1080")
-    options.binary_location = "/Applications/Firefox.app/Contents/MacOS/firefox"
-    service = Service(executable_path=GECKODRIVER_PATH)
-    driver = webdriver.Firefox(service=service, options=options)
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    service = Service()
+    driver = webdriver.Chrome(service=service, options=options)
 
     try:
         driver.get(url)
@@ -253,4 +254,3 @@ if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port)
-
