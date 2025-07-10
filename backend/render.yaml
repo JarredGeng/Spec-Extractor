@@ -4,18 +4,17 @@ services:
     env: python
     plan: free
     buildCommand: |
-      apt-get update && \
-      apt-get install -y wget unzip xvfb libxi6 libgconf-2-4 libnss3 libxss1 libappindicator1 libindicator7 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 && \
-      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-      apt install -y ./google-chrome-stable_current_amd64.deb && \
-      CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1) && \
-      wget -O chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROME_VERSION/chromedriver_linux64.zip" && \
-      unzip chromedriver.zip && \
-      mv chromedriver /usr/local/bin/chromedriver && \
+      apt-get update
+      apt-get install -y wget unzip xvfb libxi6 libgconf-2-4 libnss3 libxss1 libappindicator1 libindicator7 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0
+      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      apt install -y ./google-chrome-stable_current_amd64.deb
+      CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
+      wget -O chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_VERSION}/chromedriver_linux64.zip"
+      unzip chromedriver.zip
+      mv chromedriver /usr/local/bin/chromedriver
       chmod +x /usr/local/bin/chromedriver
-    startCommand: python app.py
+      pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
-      - key: GOOGLE_CHROME_BIN
-        value: /usr/bin/google-chrome
-      - key: CHROMEDRIVER_PATH
-        value: /usr/local/bin/chromedriver
+      - key: PORT
+        value: 10000
