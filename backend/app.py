@@ -250,4 +250,6 @@ def download_all():
     return send_file(output, download_name="All_Chassis_Specs.xlsx", as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5001))
+    app.run(host="0.0.0.0", port=port)
