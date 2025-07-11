@@ -45,7 +45,8 @@ init_db()
 # === Scraping Logic ===
 def extract_visible_specs(url):
     options = uc.ChromeOptions()
-    options.add_argument("--headless")
+    options.binary_location = "/usr/bin/google-chrome"  # 🔧 Manually set Chrome binary path
+    options.add_argument("--headless=new")  # 🧠 Use the new headless mode (more compatible)
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
