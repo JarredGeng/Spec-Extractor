@@ -1,42 +1,39 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-import re
-import sqlite3
+import re, sqlite3, io, os
 from datetime import datetime
-import undetected_chromedriver as uc
-from selenium.webdriver.common.by import By
-import os
-import io
 import xlsxwriter
+
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 # === Setup ===
 app = Flask(__name__)
 CORS(app)
-
 DB_FILE = "specs.db"
 
-# === DB Init ===
+# === Init DB ===
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS chassis_specs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            url TEXT UNIQUE,
-            model_name TEXT,
-            date_scraped TEXT,
-            cpu_socket TEXT,
-            cpu_count TEXT,
-            max_tdp TEXT,
-            total_tdp TEXT,
-            memory_type TEXT,
-            dimm_slots TEXT,
-            power_supply TEXT,
-            rack_unit TEXT,
-            drive_bays TEXT,
-            m2_slots TEXT
-        )
-    """)
+    cursor.execute("""CREATE TABLE IF NOT EXISTS chassis_specs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        url TEXT UNIQUE,
+        model_name TEXT,
+        date_scraped TEXT,
+        cpu_socket TEXT,
+        cpu_count TEXT,
+        max_tdp TEXT,
+        total_tdp TEXT,
+        memory_type TEXT,
+        dimm_slots TEXT,
+        power_supply TEXT,
+        rack_unit TEXT,
+        drive_bays TEXT,
+        m2_slots TEXT
+    )""")
     conn.commit()
     conn.close()
 
@@ -44,15 +41,16 @@ init_db()
 
 # === Scraping Logic ===
 def extract_visible_specs(url):
-    options = uc.ChromeOptions()
-    options.add_argument("--headless=new")
+    chrome_path = "/usr/bin/google-chrome"
+    options = Options()
+    options.binary_location = chrome_path
+    options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--window-size=1920x1080")
 
-    chrome_path = "/usr/bin/google-chrome"  # ✅ Common path on Render
-    driver = uc.Chrome(options=options, browser_executable_path=chrome_path)
+    service = Service("/usr/local/bin/chromedriver")  # Render path
+    driver = webdriver.Chrome(service=service, options=options)
 
     try:
         driver.get(url)
