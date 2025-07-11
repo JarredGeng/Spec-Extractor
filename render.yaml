@@ -3,10 +3,8 @@ services:
     name: spec-extractor
     env: python
     buildCommand: |
-      rm -rf /opt/render/.cache/ms-playwright
       pip install -r requirements.txt
-      playwright install --with-deps
-    startCommand: python app.py
+    startCommand: bash start.sh
     envVars:
       - key: PORT
         value: 5001
