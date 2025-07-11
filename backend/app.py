@@ -1,13 +1,9 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-import re, sqlite3, io, os
+import re, sqlite3, io
 from datetime import datetime
 import xlsxwriter
-
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
+from playwright.sync_api import sync_playwright
 
 # === Setup ===
 app = Flask(__name__)
@@ -39,28 +35,16 @@ def init_db():
 
 init_db()
 
-# === Scraping Logic ===
+# === Scraping Logic with Playwright ===
 def extract_visible_specs(url):
-    chrome_path = "/usr/bin/google-chrome"
-    options = Options()
-    options.binary_location = chrome_path
-    options.add_argument("--headless")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-
-    service = Service("/usr/local/bin/chromedriver")  # Render path
-    driver = webdriver.Chrome(service=service, options=options)
-
-    try:
-        driver.get(url)
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight / 2);")
-        text = driver.find_element(By.TAG_NAME, "body").text
-    finally:
-        driver.quit()
-
-    return text
-
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto(url, timeout=60000)
+        page.wait_for_timeout(2000)
+        text = page.inner_text("body")
+        browser.close()
+        return text
 
 def parse_spec_text(text):
     summary = {}
@@ -169,15 +153,7 @@ def get_database():
     cursor.execute("SELECT model_name, date_scraped, url FROM chassis_specs")
     rows = cursor.fetchall()
     conn.close()
-
-    result = []
-    for row in rows:
-        result.append({
-            "Model": row[0],
-            "Date Scraped": row[1],
-            "URL": row[2]
-        })
-
+    result = [{"Model": row[0], "Date Scraped": row[1], "URL": row[2]} for row in rows]
     return jsonify(result)
 
 @app.route("/api/download/<model>", methods=["GET"])
