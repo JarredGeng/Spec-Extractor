@@ -96,3 +96,4 @@ zipp==3.21.0
 future==0.18.2
 six==1.15.0
 chromedriver-autoinstaller
+undetected-chromedriver
