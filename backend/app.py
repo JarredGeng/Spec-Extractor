@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-import re, sqlite3, io
+import re, sqlite3, io, os
 from datetime import datetime
 import xlsxwriter
 from playwright.sync_api import sync_playwright
@@ -35,10 +35,11 @@ def init_db():
 
 init_db()
 
-# === Scraping Logic with Playwright ===
+# === Scraping Logic (with executable_path) ===
 def extract_visible_specs(url):
+    chromium_path = os.getenv("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH")  # from start.sh
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=True, executable_path=chromium_path)
         page = browser.new_page()
         page.goto(url, timeout=60000)
         page.wait_for_timeout(2000)
@@ -153,8 +154,7 @@ def get_database():
     cursor.execute("SELECT model_name, date_scraped, url FROM chassis_specs")
     rows = cursor.fetchall()
     conn.close()
-    result = [{"Model": row[0], "Date Scraped": row[1], "URL": row[2]} for row in rows]
-    return jsonify(result)
+    return jsonify([{"Model": row[0], "Date Scraped": row[1], "URL": row[2]} for row in rows])
 
 @app.route("/api/download/<model>", methods=["GET"])
 def download_model(model):
@@ -224,6 +224,5 @@ def download_all():
     return send_file(output, download_name="All_Chassis_Specs.xlsx", as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port)
