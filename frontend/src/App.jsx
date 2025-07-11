@@ -8,7 +8,7 @@ function App() {
   const [dbData, setDbData] = useState([]);
   const [search, setSearch] = useState('');
 
-  const API_BASE = 'https://spec-extractor.onrender.com/api';
+  const API_BASE = 'spec-extractor-production-aea5.up.railway.app';
 
   const getSpecs = async () => {
     if (!url.trim()) return;
