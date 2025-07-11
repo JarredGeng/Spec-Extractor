@@ -3,9 +3,7 @@ from flask_cors import CORS
 import re
 import sqlite3
 from datetime import datetime
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 import os
 import io
@@ -46,15 +44,14 @@ init_db()
 
 # === Scraping Logic ===
 def extract_visible_specs(url):
-    options = Options()
+    options = uc.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1920x1080")
-    options.binary_location = "/usr/bin/google-chrome"
-    service = Service(executable_path="/usr/local/bin/chromedriver")
-    driver = webdriver.Chrome(service=service, options=options)
+
+    driver = uc.Chrome(options=options)
 
     try:
         driver.get(url)
