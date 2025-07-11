@@ -45,14 +45,14 @@ init_db()
 # === Scraping Logic ===
 def extract_visible_specs(url):
     options = uc.ChromeOptions()
-    options.binary_location = "/usr/bin/google-chrome"  # 🔧 Manually set Chrome binary path
-    options.add_argument("--headless=new")  # 🧠 Use the new headless mode (more compatible)
+    options.add_argument("--headless=new")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1920x1080")
 
-    driver = uc.Chrome(options=options)
+    chrome_path = "/usr/bin/google-chrome"  # ✅ Common path on Render
+    driver = uc.Chrome(options=options, browser_executable_path=chrome_path)
 
     try:
         driver.get(url)
@@ -62,6 +62,7 @@ def extract_visible_specs(url):
         driver.quit()
 
     return text
+
 
 def parse_spec_text(text):
     summary = {}
